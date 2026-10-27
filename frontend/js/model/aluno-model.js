@@ -72,5 +72,9 @@ const AlunoModel = {
         };
     },
 
-    listar(){return [...AlunoModel.alunos];}
+    listar(){return [...AlunoModel.alunos];},
+
+    limpar(){
+        AlunoModel.alunos.length = 0;
+    }
 };

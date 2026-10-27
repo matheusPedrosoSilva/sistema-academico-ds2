@@ -6,23 +6,49 @@ const AlunoController = {
                 AlunoController.cadastrar(dados);
             }
         );
+        AlunoView.configurarBotaoLimpar(
+            function(){
+                AlunoController.limparDados();
+            }
+        );
         AlunoController.atualizarVisualizacao();
     },
     cadastrar(dados){
-        const resultado = AlunoModel.cadastrar(dados);
+        const resultado = AlunoModel.cadastrarAluno(dados);
         if(!resultado.sucesso){
             AlunoView.exibirErro(resultado.mensagem);
             return;
         }
-        AlunoView.exbirSucesso(
+        AlunoView.exibirSucesso(
             `Aluno ${resultado.aluno.nome} cadastrado com sucesso.`
         );
         AlunoView.limparFormulario();
         AlunoController.atualizarVisualizacao();
     },
+
+    limparDados(){
+        const alunos = AlunoModel.listar();
+        if(alunos.length === 0){
+            AlunoView.exibirErro(
+                "Não existem alunos para remover.",
+            );
+            return;
+        }
+        const confirmou = AlunoView.confirmarLimpeza();
+        if(!confirmou){
+            return;
+        }
+        AlunoModel.limpar();
+        AlunoService.limpar();
+        AlunoView.exibirSucesso(
+            "Todos os alunos foram removidos."
+        );
+        AlunoController.atualizarVisualizacao();
+    },
+
     atualizarVisualizacao(){
-        const alunos = AlunoModel.lista();
-        AlunoView.exbirLista(alunos);
+        const alunos = AlunoModel.listar();
+        AlunoView.exibirLista(alunos);
         const textoJson = JSON.stringify(alunos, null, 2);
         AlunoView.exibirJson(textoJson);
     }

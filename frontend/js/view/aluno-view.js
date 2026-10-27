@@ -1,6 +1,6 @@
 const AlunoView = {
     elementos: {},
-    incializar(){
+    inicializar(){
         AlunoView.elementos.formulario= document.getElementById("form-aluno");
         AlunoView.elementos.ra= document.getElementById("ra");
         AlunoView.elementos.nome= document.getElementById("nome");
@@ -9,9 +9,9 @@ const AlunoView = {
         AlunoView.elementos.turma= document.getElementById("turma");
         AlunoView.elementos.mensagem= document.getElementById("mensagem");
         AlunoView.elementos.corpoTabela= document.getElementById("corpo-tabela-alunos");
-        AlunoView.elementos.totalAlunos= document.getElementById("total-alunoas");
+        AlunoView.elementos.totalAlunos= document.getElementById("total-alunos");
         AlunoView.elementos.saidaJson= document.getElementById("saida-json");
-        
+        AlunoView.elementos.botaoLimpar= document.getElementById("btn-limpar-dados");
     },
     configurarFormulario(aoEnviar){
         AlunoView.elementos.formulario.addEventListener(
@@ -24,15 +24,32 @@ const AlunoView = {
         )
     },
 
+    configurarBotaoLimpar(aoLimpar){
+        AlunoView.elementos.botaoLimpar.addEventListener(
+            "click",
+            function(){
+                aoLimpar();
+            }
+        );
+    },
+
+
     lerDados(){
         return{
-            ra:prompt('Digite o RA do aluno:'),
-            nome:prompt('Digite o nome do aluno:'),
-            email:prompt('Digite o e-mail do aluno:'),
-            curso:prompt('Digite o curso:'),
-            turma:prompt('Digite a turma:')
+            ra:AlunoView.elementos.ra.value,
+            nome:AlunoView.elementos.nome.value,
+            email:AlunoView.elementos.email.value,
+            curso:AlunoView.elementos.curso.value,
+            turma:AlunoView.elementos.turma.value,
         };
     },
+
+    confirmarLimpeza(){
+        return confirm(
+            "Deseja remover todos os alunos cadastrados?"
+        )
+    },
+
     exibirSucesso(mensagem){
         AlunoView.elementos.mensagem.textContent = mensagem;
         AlunoView.elementos.mensagem.className = "mensagem sucesso";
@@ -48,7 +65,7 @@ const AlunoView = {
     exibirLista(alunos){
         const corpoTabela = AlunoView.elementos.corpoTabela;
         corpoTabela.textContent = "";
-        AlunoView.elementos.totalAlunos.textContent = `Total: ${alunos.lenght}`;
+        AlunoView.elementos.totalAlunos.textContent = `Total: ${alunos.length}`;
         if(alunos.length === 0){
             const linha = document.createElement("tr");
             const celula = document.createElement("td");
@@ -58,7 +75,7 @@ const AlunoView = {
             corpoTabela.appendChild(linha);
             return;
         }
-        alunos.array.forEach(function (aluno){
+        alunos.forEach(function (aluno){
             const linha = document.createElement("tr");
             const valores = [
                 aluno.id,

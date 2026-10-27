@@ -8,6 +8,7 @@
     <script src="./js/model/aluno-model.js" defer></script>
     <script src="./js/view/aluno-view.js" defer></script>
     <script src="./js/controller/aluno-controller.js" defer></script>
+    <script src="./js/service/aluno-service.js" defer></script>
 </head>
 <body>
     <header class="cabecalho">
@@ -42,7 +43,10 @@
                         <label for="turma">Turma</label>
                         <input type="text" id="turma" name="turma" placeholder="Turma" required></input>
                     </div>
-                    <button type="submit">Cadastrar aluno</button>
+                    <div class="acoes-formulario">
+                        <button type="submit">Cadastrar aluno</button>
+                        <button type="button" id="btn-limpar-dados" class="botao-secundario">Limpar dados</button>
+                    </div>
                 </div>
             </form>
             <div id="mensagem" class="mensagem" role="status" aria-live="polite">
@@ -52,17 +56,18 @@
             <div class="titulo-secao">
                 <h2>Alunos cadastrados</h2>
                 <p id="total-alunos">Total: 0</p>
-                <div class="tabela-responsiva">
+                
+            <div class="tabela-responsiva">
                     <table>
                         <thead>
                             <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
+                                <th>ID</th>
+                                <th>RA</th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Cursp</th>
+                                <th>Turma</th>
+                                <th>Situação</th>
                             </tr>
                         </thead>
                         <tbody id="corpo-tabela-alunos"></tbody>
