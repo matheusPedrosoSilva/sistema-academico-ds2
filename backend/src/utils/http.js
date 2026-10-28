@@ -13,7 +13,7 @@ export function enviarJson(res, status, dados){
     res.end(textoJson);
 }
 
-export function enviarSimConteudo(res){
+export function enviarSemConteudo(res){
     res.writeHead(204, cabecalhosCors);
     res.end();
 }
