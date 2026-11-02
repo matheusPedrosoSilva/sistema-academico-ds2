@@ -50,7 +50,7 @@ const AlunoModel = {
         if(AlunoModel.localizarPorRa(ra)){
             return{
                 sucesso:false,
-                status:400,
+                status:409,
                 mensagem: "Já existe um aluno com esse RA."
             }
         }
