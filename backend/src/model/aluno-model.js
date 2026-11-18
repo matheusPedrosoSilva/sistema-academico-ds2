@@ -10,8 +10,23 @@ const AlunoModel = {
     validarEmail(email){
         return email.includes("@")&&email.includes(".");
     },
-    localizarPorRa(ra){
-        return alunos.find(aluno =>aluno.ra ===ra);
+    converterId(id){
+        const idNumerico = Number(id);
+        if(!Number.isInteger(idNumerico) || idNumerico <= 0){
+            return null;
+        }
+        return idNumerico;
+    },
+    localizarIndicePorId(id){
+        const idNumerico = AlunoModel.converterId(id);
+        if(idNumerico===null){
+            return -1;
+        }
+        return alunos.findIndex(aluno =>aluno.id === idNumerico);
+    },
+    
+    localizarPorRa(ra, idIgnoradno = null){
+        return alunos.find(aluno =>aluno.ra ===ra && aluno.id !== idIgnoradno);
     },
     gerarProximoId(){
         if(alunos.length === 0){
@@ -21,57 +36,124 @@ const AlunoModel = {
         const maiorId = Math.max(...ids);
         return maiorId+1;
     },
-    cadastrar(dados){
-        const ra = AlunoModel.normalizarTexto(dados?.ra);
-        const nome = AlunoModel.normalizarTexto(dados?.nome);
-        const email = AlunoModel.normalizarTexto(dados?.email);
-        const curso = AlunoModel.normalizarTexto(dados?.curso);
-        const turma = AlunoModel.normalizarTexto(dados?.turma);
+    validarDados(dados,idIgnoradno = null){
+        const alunoValidado = {
+            ra: AlunoModel.normalizarTexto(dados?.ra),
+            nome: AlunoModel.normalizarTexto(dados?.nome),
+            email: AlunoModel.normalizarTexto(dados?.email).toLowerCase(),
+            curso: AlunoModel.normalizarTexto(dados?.curso),
+            turma: AlunoModel.normalizarTexto(dados?.turma),
+        };
         if(
-            ra === "" ||
-            nome === "" ||
-            turma === "" ||
-            curso === "" ||
-            email === "" 
+        alunoValidado.ra === "" ||
+        alunoValidado.nome === "" ||
+        alunoValidado.email === "" ||
+        alunoValidado.curso === "" ||
+        alunoValidado.turma === "" 
         ){
-            return{
+            return {
                 sucesso: false,
                 status: 400,
                 mensagem: "Todos os campos são obrigatórios."
-            }
+            };
         }
-        if(!AlunoModel.validarEmail(email)){
-            return{
+        if(!AlunoModel.validarEmail(alunoValidado.email)){
+            return {
                 sucesso: false,
                 status: 400,
-                mensagem: "Informe um email válido."
-            }
+                mensagem: "Informe um e-mail válido."
+            };
         }
-        if(AlunoModel.localizarPorRa(ra)){
+        if(AlunoModel.localizarPorRa(alunoValidado.ra, idIgnoradno)){
             return{
-                sucesso:false,
-                status:409,
+                sucesso: false, 
+                status: 400, 
                 mensagem: "Já existe um aluno com esse RA."
-            }
+            };
+        }
+        
+        return{
+            sucesso: true,
+            dados: alunoValidado
+        };
+    },
+
+
+    cadastrar(dados){
+        const validacao = AlunoModel.validarDados(dados);
+        if(!validacao.sucesso){
+            return validacao;
         }
         const aluno = {
             id: AlunoModel.gerarProximoId(),
-            ra,
-            nome,
-            email,
-            curso,
-            turma,
+            ...validacao.dados,
             ativo: true
         };
         alunos.push(aluno);
         return {
             sucesso: true,
             status: 201,
-            aluno
+            aluno: {...aluno}
         };
     },
     listar(){
-        return [...alunos];
+        return alunos.map( aluno => ({...aluno}));
+    },
+    buscarPorId(id){
+        const indice = AlunoModel.localizarIndicePorId(id);
+        if(indice === -1){
+            return{
+                sucesso:false,
+                status:404,
+                mensagem:"Aluno não encontrado."
+            };
+        }
+        return{
+            sucesso:true,
+            status:200,
+            aluno: {...alunos[indice]}
+        };
+    },
+    atualizar(id, dados){
+        const indice = AlunoModel.localizarIndicePorId(id);
+        if(indice === -1){
+            return{
+                sucesso:false,
+                status:404,
+                mensagem:"Aluno não encontrado"
+            };
+        }
+        const alunoAtual = alunos[indice];
+        const validacao = AlunoModel.validarDados(dados, alunoAtual.id);
+        if(!validacao.sucesso){
+            return validacao;
+        }
+        alunos[indice] = {
+            ...alunoAtual,
+            ...validacao.dados
+        };
+        return {
+            sucesso:true,
+            status:200,
+            aluno:{...alunos[indice]}
+        };
+    },
+    remover(id){
+        const indice = AlunoModel.localizarIndicePorId(id);
+        if(indice === -1){
+            return{
+                sucesso:false,
+                status:404,
+                mensagem: "Aluno não encontrado."
+            };
+        }
+        const removidos = alunos.splice(indice, 1);
+        const alunoRemovido = removidos[0];
+        return{
+            sucesso: true,
+            status: 200,
+            aluno:{...alunoRemovido}
+        };
     }
 };
 
